@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include "./constants.h"
 #include "./render_numbers.h"
+#include "SDL2/SDL_render.h"
 
 int game_is_running = FALSE;
 SDL_Window* window = NULL;
@@ -98,13 +99,13 @@ void setup() {
 	score.p1 = 0;
 	score.p2 = 0;
 
-	ball.x = WINDOW_WIDTH + 10;
-	ball.y = WINDOW_HEIGHT - 10;
 	ball.width = 15;
 	ball.height = 15;
+	ball.x = (int)(WINDOW_WIDTH / 2) - (int)(ball.width / 2);
+	ball.y = (int)(WINDOW_HEIGHT / 2) - (int)(ball.height / 2);
 
-	ball.speed_x = 3;
-	ball.speed_y = 3;
+	ball.speed_x = 5;
+	ball.speed_y = 5;
 	ball.speed_x_direction = LEFT;
 	ball.speed_y_direction = UP;
 
@@ -136,13 +137,6 @@ void setup() {
 	p2.speed = 2;
 }
 
-// void render_score(int number, int x, int y) {
-// 	switch (number) {
-// 		case 1:
-// 		break;
-// 	}
-// }
-
 void update() {
 	float delta_time = (SDL_GetTicks() - last_frame_time) / 1000.0f;
 	last_frame_time = SDL_GetTicks();
@@ -173,12 +167,22 @@ void update() {
 		}
 		ball.speed_x_direction = LEFT;
 	}
+	
+	// points
+	if  (ball.x >= WINDOW_WIDTH - ball.width - 2) {
+		score.p1++;
+		ball.x = (int)(WINDOW_WIDTH / 2);
+		ball.y = (int)(WINDOW_HEIGHT / 2);
+	}
 
-	// ball respawn after point
-	if (ball.x >= WINDOW_WIDTH - ball.width || ball.x <= 0) {
-		// TODO: points
-		ball.x = WINDOW_WIDTH / 2;
-		ball.y = WINDOW_HEIGHT / 2;
+	if  (ball.x <= 2) {
+		score.p2++;
+		ball.x = (int)(WINDOW_WIDTH / 2);
+		ball.y = (int)(WINDOW_HEIGHT / 2);
+	}
+
+	if (score.p1 > 9 || score.p2 > 9) {
+		game_is_running = FALSE;
 	}
 
 	// ball movement
@@ -230,7 +234,15 @@ void render() {
 	SDL_RenderFillRect(renderer, &p2_rect);
 
 	// render score
-	render_points(1, (int)(WINDOW_WIDTH / 2), 200, renderer);
+	render_points(score.p1, (int)(WINDOW_WIDTH / 2) - 50, 25, renderer);
+	render_points(score.p2, (int)(WINDOW_WIDTH / 2) + 50, 25, renderer);
+	SDL_Rect dash = {
+		(WINDOW_WIDTH / 2),
+		34,
+		10,
+		5
+	};
+	SDL_RenderFillRect(renderer, &dash);
 
 	SDL_RenderPresent(renderer);
 }
