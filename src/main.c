@@ -3,6 +3,7 @@
 #include <time.h> 
 #include <SDL2/SDL.h>
 #include "./constants.h"
+#include "./render_numbers.h"
 
 int game_is_running = FALSE;
 SDL_Window* window = NULL;
@@ -29,6 +30,11 @@ struct paddle {
 	float speed;
 	int speed_direction;
 } p1, p2;
+
+struct score {
+	int p1;
+	int p2;
+} score;
 
 int initialize_window(void) {
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -87,6 +93,11 @@ void process_input() {
 }
 
 void setup() {
+	setup_numbers();
+
+	score.p1 = 0;
+	score.p2 = 0;
+
 	ball.x = WINDOW_WIDTH + 10;
 	ball.y = WINDOW_HEIGHT - 10;
 	ball.width = 15;
@@ -124,6 +135,13 @@ void setup() {
 	p2.y = WINDOW_HEIGHT / 2;
 	p2.speed = 2;
 }
+
+// void render_score(int number, int x, int y) {
+// 	switch (number) {
+// 		case 1:
+// 		break;
+// 	}
+// }
 
 void update() {
 	float delta_time = (SDL_GetTicks() - last_frame_time) / 1000.0f;
@@ -210,6 +228,9 @@ void render() {
 		(int)p2.height
 	};
 	SDL_RenderFillRect(renderer, &p2_rect);
+
+	// render score
+	render_points(1, (int)(WINDOW_WIDTH / 2), 200, renderer);
 
 	SDL_RenderPresent(renderer);
 }
