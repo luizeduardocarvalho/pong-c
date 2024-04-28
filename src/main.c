@@ -16,14 +16,18 @@ struct ball {
 	float width;
 	float height;
 	int speed_x;
+	int speed_x_direction;
 	int speed_y;
+	int speed_y_direction;
 } ball;
 
 struct paddle {
 	float x;
 	float y;
 	float height;
+	float width;
 	float speed;
+	int speed_direction;
 } p1, p2;
 
 int initialize_window(void) {
@@ -69,11 +73,13 @@ void process_input() {
 				game_is_running = FALSE;
 			} else if (event.key.keysym.sym == SDLK_w) {
 				if (p1.y >= 0 + 1) {
-					p1.y -= 1 * p1.speed;
+					p1.speed_direction = UP;
+					p1.y += 1 * p1.speed * p1.speed_direction;
 				}
 			} else if (event.key.keysym.sym == SDLK_s) {
 				if (p1.y <= (WINDOW_HEIGHT - p1.height - 1)) {
-					p1.y += 1 * p1.speed;
+					p1.speed_direction = DOWN;
+					p1.y += 1 * p1.speed * p1.speed_direction;
 				}
 			}
 			break;
@@ -86,51 +92,93 @@ void setup() {
 	ball.width = 15;
 	ball.height = 15;
 
-	ball.speed_x = 2;
-	ball.speed_y = 2;
+	ball.speed_x = 3;
+	ball.speed_y = 3;
+	ball.speed_x_direction = LEFT;
+	ball.speed_y_direction = UP;
 
 	// random start
-	srand(time(0));
-	int gen_x = rand() % 2;
+	// srand(time(0));
+	// int gen_x = rand() % 2;
+	//
+	// if (gen_x == 1) {
+	// 	ball.speed_x *= -1;
+	// }
 
-	if (gen_x == 1) {
-		ball.speed_x *= -1;
-	}
-
-	srand(time(0));
-	int gen_y = rand() % 2;
-
-	if (gen_y == 1) {
-		ball.speed_y *= -1;
-	}
+	// srand(time(0));
+	// int gen_y = rand() % 2;
+	//
+	// if (gen_y == 1) {
+	// 	ball.speed_y_direction = UP;
+	// }
 
 	p1.x = 10;
 	p1.y = WINDOW_HEIGHT / 2;
 	p1.height = WINDOW_HEIGHT / 4;	
-	p1.speed = 10;
+	p1.width = 20;
+	p1.speed = 15;
 
-	p2.x = WINDOW_WIDTH -3;
+	p2.height = WINDOW_HEIGHT / 4;	
+	p2.width = 20;
+	p2.x = WINDOW_WIDTH - 10 - p2.width;
 	p2.y = WINDOW_HEIGHT / 2;
-	p2.height = 50;	
+	p2.speed = 2;
 }
 
 void update() {
 	float delta_time = (SDL_GetTicks() - last_frame_time) / 1000.0f;
 	last_frame_time = SDL_GetTicks();
 
-	if (ball.y <= 0 || ball.y >= WINDOW_HEIGHT - ball.height) {
-		ball.speed_y *= -1;
+	// ball redirection when hitting walls
+	if (ball.y >= WINDOW_HEIGHT - ball.height) {
+		ball.speed_y_direction = UP;
+	} 
+
+	if (ball.y <= 0) { 
+		ball.speed_y_direction = DOWN;
 	}
 
+	// ball redirection when hitting paddles
+	if ((ball.x <= p1.x + 1 + p1.width && ball.x >= p1.x) &&
+			ball.y + ball.height >= p1.y - 1 && ball.y <= p1.y + p1.height - 1) {
+		if ((p1.speed_direction == UP && ball.speed_y_direction == DOWN) ||
+			(p1.speed_direction == DOWN && ball.speed_y_direction == UP)) {
+			ball.speed_y_direction *= -1;
+		}
+		ball.speed_x_direction = RIGHT;
+	}
+
+	if ((ball.x >= p2.x - ball.width && ball.x <= p2.x + p2.width) &&
+			ball.y + ball.height >= p2.y + 1 && ball.y <= p2.y + p2.height - 1) {
+		if ((p2.speed > 0 && ball.speed_y < 0) || (p2.speed < 0 && ball.speed_y > 0)) {
+			ball.speed_y_direction *= -1;
+		}
+		ball.speed_x_direction = LEFT;
+	}
+
+	// ball respawn after point
 	if (ball.x >= WINDOW_WIDTH - ball.width || ball.x <= 0) {
 		// TODO: points
 		ball.x = WINDOW_WIDTH / 2;
 		ball.y = WINDOW_HEIGHT / 2;
 	}
 
-	ball.x += 50 * delta_time * ball.speed_x;
-	ball.y += 50 * delta_time * ball.speed_y;
+	// ball movement
+	ball.x += 50 * delta_time * ball.speed_x * ball.speed_x_direction;
+	ball.y += 50 * delta_time * ball.speed_y * ball.speed_y_direction;
 
+	// p2 paddle movement
+	if (ball.speed_x_direction == RIGHT) {
+		if (ball.speed_y_direction == UP && p2.y >= 0) {
+			p2.speed_direction = UP;
+			p2.y += 50 * p2.speed * p2.speed_direction * delta_time;
+		}
+
+		if (ball.speed_y_direction == DOWN && p2.y + p2.height <= WINDOW_HEIGHT) {
+			p2.speed_direction = DOWN;
+			p2.y += 50 * p2.speed * p2.speed_direction * delta_time;
+		}
+	}
 }
 
 void render() {
@@ -150,11 +198,18 @@ void render() {
 	SDL_Rect p1_rect = {
 		(int)p1.x,
 		(int)p1.y,
-		20,
+		(int)p1.width,
 		(int)p1.height
 	};
-
 	SDL_RenderFillRect(renderer, &p1_rect);
+
+	SDL_Rect p2_rect = {
+		(int)p2.x,
+		(int)p2.y,
+		(int)p2.width,
+		(int)p2.height
+	};
+	SDL_RenderFillRect(renderer, &p2_rect);
 
 	SDL_RenderPresent(renderer);
 }
