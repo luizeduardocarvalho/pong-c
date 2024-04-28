@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
+#include <sqlite3.h>
 #include <time.h> 
 #include <SDL2/SDL.h>
 #include "./constants.h"
@@ -7,8 +9,10 @@
 #include "SDL2/SDL_render.h"
 
 int game_is_running = FALSE;
+int is_menu = TRUE;
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
+sqlite3* db = NULL;
 
 int last_frame_time = 0;
 
@@ -93,6 +97,21 @@ void process_input() {
 	}
 }
 
+void process_menu_input() {
+	SDL_Event event;
+	SDL_PollEvent(&event);
+
+	switch(event.type) {
+		case SDL_KEYDOWN:
+			if (event.key.keysym.sym == SDLK_ESCAPE) {
+				game_is_running = FALSE;
+			} else if (event.key.keysym.sym == SDLK_w) {
+			} else if (event.key.keysym.sym == SDLK_s) {
+			}
+			break;
+	}
+}
+
 void setup() {
 	setup_numbers();
 
@@ -134,7 +153,7 @@ void setup() {
 	p2.width = 20;
 	p2.x = WINDOW_WIDTH - 10 - p2.width;
 	p2.y = WINDOW_HEIGHT / 2;
-	p2.speed = 2;
+	p2.speed = 2.5;
 }
 
 void update() {
@@ -203,6 +222,13 @@ void update() {
 	}
 }
 
+void render_menu() {
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderClear(renderer);
+
+
+}
+
 void render() {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
@@ -254,9 +280,25 @@ void destroy_window() {
 }
 
 int main() {
+	int rc = sqlite3_open("game.db", &db);
+
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "Cannot open databse: %s\n", sqlite3_errmsg(db));
+		sqlite3_close(db);
+
+		return 1;
+	}
+
+	// while(is_menu) {
+	// 	render_menu();
+	// 	process_menu_input();
+	// }
+
 	game_is_running = initialize_window();
 
 	setup();
+	render();
+	sleep(2);
 
 	while (game_is_running) {
 		process_input();

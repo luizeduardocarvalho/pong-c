@@ -1,13 +1,9 @@
 #include <SDL2/SDL.h>
 #include <string.h>
+#include "point.h"
 
 #define NUMBER_WIDTH 5
 #define NUMBER_HEIGHT 5
-
-struct point {
-  int x;
-  int y;
-};
 
 struct numbers {
   struct point points[15];
