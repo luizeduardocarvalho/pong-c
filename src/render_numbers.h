@@ -1,6 +1,9 @@
+#ifndef RENDER_NUMBERS_H
+#define RENDER_NUMBERS_H
+
+#include "point.h"
 #include <SDL2/SDL.h>
 #include <string.h>
-#include "point.h"
 
 #define NUMBER_WIDTH 5
 #define NUMBER_HEIGHT 5
@@ -185,7 +188,7 @@ void setup_numbers() {
 void render_points(int number, int x, int y, SDL_Renderer *renderer) {
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-  for (int i = 0; i < 13; i++) {
+  for (int i = 0; i < 15; i++) {
     if (numbers[number].points[i].x == -1) {
       continue;
     }
@@ -197,3 +200,5 @@ void render_points(int number, int x, int y, SDL_Renderer *renderer) {
     SDL_RenderFillRect(renderer, &number_rect);
   }
 }
+
+#endif
