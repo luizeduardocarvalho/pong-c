@@ -279,14 +279,15 @@ int main() {
   // }
 
   setup();
-  sleep(2);
 
-  while (is_menu && game_is_running) {
-    render_menu();
-    process_menu_input();
-  }
+  // while (is_menu && game_is_running) {
+  //   render_menu();
+  //   process_menu_input();
+  // }
 
   render();
+  sleep(2);
+
   while (game_is_running) {
     process_input();
     update();
