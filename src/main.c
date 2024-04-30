@@ -111,6 +111,7 @@ void process_menu_input() {
 
 void setup() {
   setup_numbers();
+  setup_letters();
 
   score.p1 = 0;
   score.p2 = 0;
@@ -227,8 +228,11 @@ void render_menu() {
   char title[] = {'p', 'o', 'n', 'g', '\0'};
 
   for (int i = 0; i < title[i] != '\0'; i++) {
-    render_letters(title[i], 50 + i * 20, 50, renderer);
+    render_letters(title[i], (WINDOW_WIDTH / 2 - 40) + i * 20,
+                   WINDOW_HEIGHT / 2, renderer);
   }
+
+  SDL_RenderPresent(renderer);
 }
 
 void render() {
@@ -253,14 +257,6 @@ void render() {
   SDL_Rect dash = {(WINDOW_WIDTH / 2), 34, 10, 5};
   SDL_RenderFillRect(renderer, &dash);
 
-  setup_letters();
-
-  char title[] = {'p', 'o', 'n', 'g', '\0'};
-
-  for (int i = 0; i < title[i] != '\0'; i++) {
-    render_letters(title[i], 50 + i*20, 50, renderer);
-  }
-
   SDL_RenderPresent(renderer);
 }
 
@@ -282,15 +278,15 @@ int main() {
   // 	return 1;
   // }
 
-  // while(is_menu && game_is_running) {
-  // 	render_menu();
-  // 	process_menu_input();
-  // }
-
   setup();
-  render();
   sleep(2);
 
+  while (is_menu && game_is_running) {
+    render_menu();
+    process_menu_input();
+  }
+
+  render();
   while (game_is_running) {
     process_input();
     update();
