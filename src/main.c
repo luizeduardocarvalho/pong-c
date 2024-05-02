@@ -229,7 +229,7 @@ void render_menu() {
 
   for (int i = 0; i < title[i] != '\0'; i++) {
     render_letters(title[i], (WINDOW_WIDTH / 2 - 40) + i * 20,
-                   WINDOW_HEIGHT / 2, renderer);
+                   WINDOW_HEIGHT / 2, renderer, TRUE);
   }
 
   SDL_RenderPresent(renderer);
@@ -280,10 +280,10 @@ int main() {
 
   setup();
 
-  // while (is_menu && game_is_running) {
-  //   render_menu();
-  //   process_menu_input();
-  // }
+  while (is_menu && game_is_running) {
+    render_menu();
+    process_menu_input();
+  }
 
   render();
   sleep(2);

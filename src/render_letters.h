@@ -90,18 +90,18 @@ void setup_letters() {
                       {0 * LETTER_WIDTH, 3 * LETTER_HEIGHT},
                       {0 * LETTER_WIDTH, 4 * LETTER_HEIGHT}};
 
-  struct point G[] = {{1 * LETTER_WIDTH, 0 * LETTER_HEIGHT},
+  struct point G[] = {{0 * LETTER_WIDTH, 0 * LETTER_HEIGHT},
+                      {1 * LETTER_WIDTH, 0 * LETTER_HEIGHT},
                       {2 * LETTER_WIDTH, 0 * LETTER_HEIGHT},
-                      {3 * LETTER_WIDTH, 0 * LETTER_HEIGHT},
                       {0 * LETTER_WIDTH, 1 * LETTER_HEIGHT},
+                      {2 * LETTER_WIDTH, 1 * LETTER_HEIGHT},
                       {0 * LETTER_WIDTH, 2 * LETTER_HEIGHT},
                       {0 * LETTER_WIDTH, 3 * LETTER_HEIGHT},
                       {1 * LETTER_WIDTH, 3 * LETTER_HEIGHT},
                       {2 * LETTER_WIDTH, 3 * LETTER_HEIGHT},
-                      {3 * LETTER_WIDTH, 3 * LETTER_HEIGHT},
+                      {0 * LETTER_WIDTH, 4 * LETTER_HEIGHT},
                       {1 * LETTER_WIDTH, 4 * LETTER_HEIGHT},
                       {2 * LETTER_WIDTH, 4 * LETTER_HEIGHT},
-                      {-1, -1},
                       {-1, -1},
                       {-1, -1},
                       {-1, -1}};
@@ -178,33 +178,33 @@ void setup_letters() {
                       {3 * LETTER_WIDTH, 4 * LETTER_HEIGHT}};
 
   struct point N[] = {{0 * LETTER_WIDTH, 0 * LETTER_HEIGHT},
-                      {3 * LETTER_WIDTH, 0 * LETTER_HEIGHT},
                       {0 * LETTER_WIDTH, 1 * LETTER_HEIGHT},
-                      {2 * LETTER_WIDTH, 1 * LETTER_HEIGHT},
-                      {3 * LETTER_WIDTH, 1 * LETTER_HEIGHT},
                       {0 * LETTER_WIDTH, 2 * LETTER_HEIGHT},
-                      {1 * LETTER_WIDTH, 2 * LETTER_HEIGHT},
-                      {3 * LETTER_WIDTH, 2 * LETTER_HEIGHT},
                       {0 * LETTER_WIDTH, 3 * LETTER_HEIGHT},
-                      {3 * LETTER_WIDTH, 3 * LETTER_HEIGHT},
                       {0 * LETTER_WIDTH, 4 * LETTER_HEIGHT},
-                      {3 * LETTER_WIDTH, 4 * LETTER_HEIGHT},
+                      {2 * LETTER_WIDTH, 0 * LETTER_HEIGHT},
+                      {2 * LETTER_WIDTH, 1 * LETTER_HEIGHT},
+                      {2 * LETTER_WIDTH, 2 * LETTER_HEIGHT},
+                      {2 * LETTER_WIDTH, 3 * LETTER_HEIGHT},
+                      {2 * LETTER_WIDTH, 4 * LETTER_HEIGHT},
+                      {1 * LETTER_WIDTH, 1 * LETTER_HEIGHT},
+                      {1 * LETTER_WIDTH, 2 * LETTER_HEIGHT},
                       {-1, -1},
                       {-1, -1},
                       {-1, -1}};
 
   struct point O[] = {{1 * LETTER_WIDTH, 0 * LETTER_HEIGHT},
                       {2 * LETTER_WIDTH, 0 * LETTER_HEIGHT},
-                      {0 * LETTER_WIDTH, 1 * LETTER_HEIGHT},
-                      {3 * LETTER_WIDTH, 1 * LETTER_HEIGHT},
-                      {0 * LETTER_WIDTH, 2 * LETTER_HEIGHT},
-                      {3 * LETTER_WIDTH, 2 * LETTER_HEIGHT},
-                      {0 * LETTER_WIDTH, 3 * LETTER_HEIGHT},
-                      {3 * LETTER_WIDTH, 3 * LETTER_HEIGHT},
-                      {1 * LETTER_WIDTH, 4 * LETTER_HEIGHT},
+                      {0 * LETTER_WIDTH, 0 * LETTER_HEIGHT},
+                      {2 * LETTER_WIDTH, 1 * LETTER_HEIGHT},
+                      {2 * LETTER_WIDTH, 2 * LETTER_HEIGHT},
+                      {2 * LETTER_WIDTH, 3 * LETTER_HEIGHT},
                       {2 * LETTER_WIDTH, 4 * LETTER_HEIGHT},
-                      {-1, -1},
-                      {-1, -1},
+                      {1 * LETTER_WIDTH, 4 * LETTER_HEIGHT},
+                      {0 * LETTER_WIDTH, 4 * LETTER_HEIGHT},
+                      {0 * LETTER_WIDTH, 3 * LETTER_HEIGHT},
+                      {0 * LETTER_WIDTH, 2 * LETTER_HEIGHT},
+                      {0 * LETTER_WIDTH, 1 * LETTER_HEIGHT},
                       {-1, -1},
                       {-1, -1},
                       {-1, -1}};
@@ -212,15 +212,15 @@ void setup_letters() {
   struct point P[] = {{0 * LETTER_WIDTH, 0 * LETTER_HEIGHT},
                       {1 * LETTER_WIDTH, 0 * LETTER_HEIGHT},
                       {2 * LETTER_WIDTH, 0 * LETTER_HEIGHT},
-                      {3 * LETTER_WIDTH, 0 * LETTER_HEIGHT},
                       {0 * LETTER_WIDTH, 1 * LETTER_HEIGHT},
-                      {3 * LETTER_WIDTH, 1 * LETTER_HEIGHT},
+                      {2 * LETTER_WIDTH, 1 * LETTER_HEIGHT},
                       {0 * LETTER_WIDTH, 2 * LETTER_HEIGHT},
                       {1 * LETTER_WIDTH, 2 * LETTER_HEIGHT},
                       {2 * LETTER_WIDTH, 2 * LETTER_HEIGHT},
-                      {3 * LETTER_WIDTH, 2 * LETTER_HEIGHT},
                       {0 * LETTER_WIDTH, 3 * LETTER_HEIGHT},
                       {0 * LETTER_WIDTH, 4 * LETTER_HEIGHT},
+                      {-1, -1},
+                      {-1, -1},
                       {-1, -1},
                       {-1, -1},
                       {-1, -1}};
@@ -366,7 +366,8 @@ void setup_letters() {
 }
 
 // TODO: Create a generic method to print letters and numbers
-void render_letters(char letter, int x, int y, SDL_Renderer *renderer) {
+void render_letters(char letter, int x, int y, SDL_Renderer *renderer,
+                    int withSpace) {
   const char *const alphabet = "abcdefghijklmnopqrstuvwxyz";
   char *p = strchr(alphabet, (unsigned char)letter);
   int n = p - alphabet;
@@ -384,6 +385,11 @@ void render_letters(char letter, int x, int y, SDL_Renderer *renderer) {
 
     SDL_RenderFillRect(renderer, &letter_rect);
   }
+
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+  SDL_Rect space_rect = {LETTER_WIDTH * 3 + x, LETTER_WIDTH * 3 + y,
+                         LETTER_WIDTH, LETTER_HEIGHT};
+  SDL_RenderFillRect(renderer, &space_rect);
 }
 
 #endif
